@@ -35,7 +35,8 @@
 
 .img-text-container{
     padding-left: 7px;
-    font-size: 1.12em;
+    font-size: 20px;
+    overflow: hidden;
    
 }
 
@@ -52,7 +53,7 @@
 
 #caption{
     color: grey;
-    font-size: large;
+    font-size: 20px;
     width: 100%;
     height: auto;
     text-align: center;
