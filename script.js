@@ -5,21 +5,66 @@ const ImagesArray = AllImages;
 let left_container = document.querySelector(".left-container");
 let buttonsArray = new Array();
 
-function displayTextConvert(toReplace){
-    if(toReplace.length <= 30){
+function displayTextConvert(toReplace , fontSize){
+
+    
+    let treshold = Math.floor((20*20)/(fontSize));
+
+   
+    if(toReplace.length <= treshold){
+       
         return toReplace;
     }
     let resStr="";
-    for(let i=0;i<17;i++){
-        resStr+=toReplace[i];
-    }
+
+    let totChar = toReplace.length;
     
-    resStr+="...";
+   console.assert(totChar > treshold , "Entire length consumed");
+    
 
-    for(let i=toReplace.length-10;i<toReplace.length;++i){
-        resStr+=toReplace[i];
+    // removing from mid .. 
+
+    let blockedInd = new Array();
+
+    for(let i=0;i<totChar;i++){
+        blockedInd.push(0);
     }
 
+    let toRem = totChar - treshold;
+
+    blockedInd[Math.floor(totChar/2)]=1;
+    --toRem;
+
+    // block floor(toRem/2) in right
+    // block ceil(toRem/2) in left
+
+    let idx = Math.floor(totChar/2) + 1;
+
+    for(let cnt = 0; cnt < Math.floor(toRem/2) ; ++cnt){
+        blockedInd[idx] = 1;
+        ++idx;
+    }
+
+    idx = Math.floor(totChar/2) - 1;
+    for(let cnt = 0; cnt < Math.ceil(toRem/2); ++cnt){
+        blockedInd[idx] = 1;
+        --idx;
+    }
+
+    let got=0;
+
+    for(let i=0;i<totChar;i++){
+        if(blockedInd[i]==0) resStr+=toReplace[i];
+        else if(!got){
+            // a continous sequence will be blocked
+            got=1;
+            resStr+="..";
+        }
+        
+    }
+
+   
+  
     return resStr;
 
 }
@@ -34,6 +79,7 @@ ImagesArray.forEach((item,index) => {
     let displayText = item.title;
 
 
+
     let img_id = `image-${index}`;
     let text = `
                 <div class="left-button-container">
@@ -41,7 +87,7 @@ ImagesArray.forEach((item,index) => {
                 <img src = ${imgsrc} id=${img_id} class="left-images"></img>
                 </div>
                 <div class = "img-text-container">
-                ${displayTextConvert(displayText)}
+                ${displayTextConvert(displayText,20)}
                 </div>
                 </div>
                 `;
@@ -53,6 +99,10 @@ ImagesArray.forEach((item,index) => {
 
 
 
+
+let curButton=0 , numButtons = ImagesArray.length;
+
+
 function displayImageForButton(index){
     let right_img = document.querySelector(".right-image");
     right_img.setAttribute("src" , ImagesArray[index].previewImage);
@@ -60,9 +110,15 @@ function displayImageForButton(index){
     let caption_txt = document.getElementById("caption");
 
     caption_txt.value = (ImagesArray[index].title);
-}
 
-let curButton=0 , numButtons = ImagesArray.length;
+    
+    let el = buttonsArray[index].querySelector('.img-text-container');
+    let style = window.getComputedStyle(el, null).getPropertyValue('font-size');
+    let fontSize = parseInt(style);
+    el.innerText = displayTextConvert(ImagesArray[index].title,fontSize);
+
+    
+}
 
 displayImageForButton(0);
 buttonsArray[0].focus();
@@ -74,6 +130,7 @@ buttonsArray.forEach( (button,index) => {
         curButton = index;
         button.style.backgroundColor = "#0AA1DD";
 
+        
       for(let i=0;i<numButtons;i++){
             if(i == index) continue;
             buttonsArray[i].style.backgroundColor="white";
@@ -116,6 +173,14 @@ img_caption.addEventListener( "input" , (event) => {
     let newText = event.target.value;
 
     let textField = buttonsArray[curButton].querySelector(".img-text-container");
-    textField.innerText = displayTextConvert(newText);
-    ImagesArray[curButton].title = newText;
+
+    let el = textField;
+    let style = window.getComputedStyle(el, null).getPropertyValue('font-size');
+    let fontSize = parseInt(style); 
+   
+    textField.innerText = displayTextConvert(newText,fontSize);
+
+    ImagesArray[curButton].title = (newText);
+
+    
 } );
