@@ -145,8 +145,7 @@ buttonsArray.forEach((button,index) => {
         let buttonNo = `button-${curButton}`;
 
         document.getElementById(buttonNo).focus(); 
-        displayImageForButton(curButton); 
-        buttonsArray[curButton].style.backgroundColor="#0AA1DD";
+        displayImageForButton(curButton);
 
     });
 });
