@@ -1,73 +1,10 @@
 import AllImages from "./AllImages.js";
+import TextTruncator from "./displayTextConvert.js";
 
-const ImagesArray = AllImages;
+let ImagesArray = AllImages;
 
 let left_container = document.querySelector(".left-container");
 let buttonsArray = new Array();
-
-function displayTextConvert(toReplace , fontSize){
-
-    
-    let treshold = Math.floor((20*20)/(fontSize));
-
-   
-    if(toReplace.length <= treshold){
-       
-        return toReplace;
-    }
-    let resStr="";
-
-    let totChar = toReplace.length;
-    
-   console.assert(totChar > treshold , "Entire length consumed");
-    
-
-    // removing from mid .. 
-
-    let blockedInd = new Array();
-
-    for(let i=0;i<totChar;i++){
-        blockedInd.push(0);
-    }
-
-    let toRem = totChar - treshold;
-
-    blockedInd[Math.floor(totChar/2)]=1;
-    --toRem;
-
-    // block floor(toRem/2) in right
-    // block ceil(toRem/2) in left
-
-    let idx = Math.floor(totChar/2) + 1;
-
-    for(let cnt = 0; cnt < Math.floor(toRem/2) ; ++cnt){
-        blockedInd[idx] = 1;
-        ++idx;
-    }
-
-    idx = Math.floor(totChar/2) - 1;
-    for(let cnt = 0; cnt < Math.ceil(toRem/2); ++cnt){
-        blockedInd[idx] = 1;
-        --idx;
-    }
-
-    let got=0;
-
-    for(let i=0;i<totChar;i++){
-        if(blockedInd[i]==0) resStr+=toReplace[i];
-        else if(!got){
-            // a continous sequence will be blocked
-            got=1;
-            resStr+="..";
-        }
-        
-    }
-
-   
-  
-    return resStr;
-
-}
 
 ImagesArray.forEach((item,index) => {
     let button = document.createElement("button");
@@ -87,7 +24,7 @@ ImagesArray.forEach((item,index) => {
                 <img src = ${imgsrc} id=${img_id} class="left-images"></img>
                 </div>
                 <div class = "img-text-container">
-                ${displayTextConvert(displayText,20)}
+                ${TextTruncator(displayText,13)}
                 </div>
                 </div>
                 `;
@@ -98,9 +35,57 @@ ImagesArray.forEach((item,index) => {
 });
 
 
+function getTreshold() {
+
+    
+    let tempDiv = document.createElement("div");
+   
+    let el = document.querySelector(".img-text-container");
+
+    let style = window.getComputedStyle(el, null).getPropertyValue('font-size');
+    tempDiv.style.overflow="hidden";
+    let fontSize = parseFloat(style);
 
 
-let curButton=0 , numButtons = ImagesArray.length;
+    tempDiv.style.width = "220px";
+    tempDiv.style.fontSize = fontSize+"px";
+
+    let style2 = window.getComputedStyle(el, null).getPropertyValue('max-width');
+    let maxWidth = parseFloat(style2);
+
+    let treshold = 0;
+
+    //console.log("maxWidth ", maxWidth);
+    let cur="";
+
+    document.body.appendChild(tempDiv); 
+ 
+    while(tempDiv.scrollWidth < maxWidth){
+       
+      
+        cur+="M";
+        tempDiv.innerText=cur;
+        treshold++;
+
+        if(treshold>1000){
+            console.log("inf loop");
+            break;
+        }
+
+        // console.log("new width ", tempDiv.scrollWidth);
+        // console.log("new Height ", tempDiv.clientHeight);
+        // console.log(tempDiv.innerText);
+    }
+
+    document.body.removeChild(tempDiv);
+
+    return treshold;
+    
+}
+
+
+
+let curButton=0,numButtons = buttonsArray.length;
 
 
 function displayImageForButton(index){
@@ -111,59 +96,58 @@ function displayImageForButton(index){
 
     caption_txt.value = (ImagesArray[index].title);
 
-    
-    let el = buttonsArray[index].querySelector('.img-text-container');
-    let style = window.getComputedStyle(el, null).getPropertyValue('font-size');
-    let fontSize = parseInt(style);
-    el.innerText = displayTextConvert(ImagesArray[index].title,fontSize);
+    buttonsArray[index].querySelector(".img-text-container").innerHTML
+             = TextTruncator(ImagesArray[index].title,getTreshold());
 
     
 }
 
 displayImageForButton(0);
 buttonsArray[0].focus();
-buttonsArray[0].style.backgroundColor="#0AA1DD";
 
 buttonsArray.forEach( (button,index) => {
     button.addEventListener( "click" , () => {
 
+        buttonsArray[curButton].style.backgroundColor="white"; 
+
         curButton = index;
-        button.style.backgroundColor = "#0AA1DD";
 
-        
-      for(let i=0;i<numButtons;i++){
-            if(i == index) continue;
-            buttonsArray[i].style.backgroundColor="white";
-        }
-    
-         displayImageForButton(index);
-
-    } );
-});
+        buttonsArray[curButton].style.backgroundColor="#0AA1DD";
+        displayImageForButton(curButton);
 
 
-buttonsArray.forEach( (button,index) => {
+    })
+} );
+
+buttonsArray.forEach((button,index) => {
     button.addEventListener("keydown" , (event) => {
 
-        curButton = index;
+        event.preventDefault();
+
+        console.log("PrevButton " , curButton);
+        curButton = index;  
+
         buttonsArray[curButton].style.backgroundColor = "white";
         if(event.key == "ArrowUp"){
-            if(curButton == 0){
-               curButton = numButtons-1;
-            }
-            else --curButton;
-            
+          curButton = (curButton-1)%numButtons;
+          if(curButton<0) curButton+=numButtons;
         }
 
-        else if(event.key == "ArrowDown"){
-            if(curButton == numButtons-1) curButton=0;
-            else ++curButton;
+        else if(event.key == "ArrowDown" || event.key=="Tab"){
+           curButton = (curButton+1)%numButtons;
+           if(curButton<0) curButton+=numButtons;
         }
-
-        buttonsArray[curButton].focus();
-        displayImageForButton(curButton);
-        buttonsArray[curButton].style.backgroundColor = "#0AA1DD";
         
+
+        console.log("curButton " , curButton);
+        console.log("key " , event.key);
+
+        let buttonNo = `button-${curButton}`;
+
+        document.getElementById(buttonNo).focus(); 
+        displayImageForButton(curButton); 
+        buttonsArray[curButton].style.backgroundColor="#0AA1DD";
+
     });
 });
 
@@ -173,14 +157,8 @@ img_caption.addEventListener( "input" , (event) => {
     let newText = event.target.value;
 
     let textField = buttonsArray[curButton].querySelector(".img-text-container");
-
-    let el = textField;
-    let style = window.getComputedStyle(el, null).getPropertyValue('font-size');
-    let fontSize = parseInt(style); 
    
-    textField.innerText = displayTextConvert(newText,fontSize);
+    textField.innerText = TextTruncator(newText,getTreshold());
 
-    ImagesArray[curButton].title = (newText);
-
-    
+    ImagesArray[curButton].title = (newText);  
 } );
