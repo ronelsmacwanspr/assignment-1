@@ -1,24 +1,24 @@
-import AllImages from "./AllImages.js";
+import AllImagesData from "./AllImagesData.js";
 import TextTruncator from "./displayTextConvert.js";
 
-let ImagesArray = AllImages;
+const ImageItems = AllImagesData;
 
-let left_container = document.querySelector(".left-container");
-let buttonsArray = new Array();
+const leftImagesContainer = document.querySelector(".left-container");
+const buttonsArray = new Array();
 
-ImagesArray.forEach((item,index) => {
-    let button = document.createElement("button");
+ImageItems.forEach((item,index) => {
+    const button = document.createElement("button");
    
-    let button_id = `button-${index}`;
+    const button_id = `button-${index}`;
     button.setAttribute("id",button_id);
     button.setAttribute("class","left-buttons");
-    let imgsrc = item.previewImage;
-    let displayText = item.title;
+    const imgsrc = item.previewImage;
+    const displayText = item.title;
 
 
 
-    let img_id = `image-${index}`;
-    let text = `
+    const img_id = `image-${index}`;
+    const text = `
                 <div class="left-button-container">
                 <div class = "img-container">
                 <img src = ${imgsrc} id=${img_id} class="left-images"></img>
@@ -30,7 +30,7 @@ ImagesArray.forEach((item,index) => {
                 `;
 
     button.innerHTML = text;
-    left_container.appendChild(button);
+    leftImagesContainer.appendChild(button);
     buttonsArray.push(button);
 });
 
@@ -38,20 +38,20 @@ ImagesArray.forEach((item,index) => {
 function getTreshold() {
 
     
-    let tempDiv = document.createElement("div");
+    const tempDiv = document.createElement("div");
    
-    let el = document.querySelector(".img-text-container");
+    const el = document.querySelector(".img-text-container");
 
-    let style = window.getComputedStyle(el, null).getPropertyValue('font-size');
+    const style = window.getComputedStyle(el, null).getPropertyValue('font-size');
     tempDiv.style.overflow="hidden";
-    let fontSize = parseFloat(style);
+    const fontSize = parseFloat(style);
 
 
     tempDiv.style.width = "220px";
     tempDiv.style.fontSize = fontSize+"px";
 
-    let style2 = window.getComputedStyle(el, null).getPropertyValue('max-width');
-    let maxWidth = parseFloat(style2);
+    const style2 = window.getComputedStyle(el, null).getPropertyValue('max-width');
+    const maxWidth = parseFloat(style2);
 
     let treshold = 0;
 
@@ -83,19 +83,20 @@ function getTreshold() {
 
 
 
-let curButton=0,numButtons = buttonsArray.length;
+let curButton=0;
+const numButtons = buttonsArray.length;
 
 
 function displayImageForButton(index){
-    let right_img = document.querySelector(".right-image");
-    right_img.setAttribute("src" , ImagesArray[index].previewImage);
+    const right_img = document.querySelector(".right-image");
+    right_img.setAttribute("src" , ImageItems[index].previewImage);
 
-    let caption_txt = document.getElementById("caption");
+    const caption_txt = document.getElementById("caption");
 
-    caption_txt.value = (ImagesArray[index].title);
+    caption_txt.value = (ImageItems[index].title);
 
     buttonsArray[index].querySelector(".img-text-container").innerHTML
-             = TextTruncator(ImagesArray[index].title,getTreshold());
+             = TextTruncator(ImageItems[index].title,getTreshold());
 
     
 }
@@ -119,8 +120,7 @@ buttonsArray.forEach((button,index) => {
 
         
         curButton = index;  
-        let id = `button-${curButton}`;
-        
+  
         buttonsArray[curButton].blur();
 
         if(event.key == "ArrowUp"){
@@ -133,10 +133,9 @@ buttonsArray.forEach((button,index) => {
            if(curButton==numButtons) curButton=0;
         }
         
+        console.log(curButton);
         console.assert(curButton>=0 && curButton<numButtons, "out of bounds");
 
-        
-        id = `button-${curButton}`;
 
         buttonsArray[curButton].focus(); 
         displayImageForButton(curButton); 
@@ -144,14 +143,14 @@ buttonsArray.forEach((button,index) => {
     });
 });
 
-let img_caption = document.getElementById("caption");
+const img_caption = document.getElementById("caption");
 
 img_caption.addEventListener( "input" , (event) => {
-    let newText = event.target.value;
+    const newText = event.target.value;
 
-    let textField = buttonsArray[curButton].querySelector(".img-text-container");
+    const textField = buttonsArray[curButton].querySelector(".img-text-container");
    
     textField.innerText = TextTruncator(newText,getTreshold());
 
-    ImagesArray[curButton].title = (newText);  
+    ImageItems[curButton].title = (newText);  
 } );
