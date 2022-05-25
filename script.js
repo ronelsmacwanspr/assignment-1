@@ -72,9 +72,7 @@ function getTreshold() {
             break;
         }
 
-        // console.log("new width ", tempDiv.scrollWidth);
-        // console.log("new Height ", tempDiv.clientHeight);
-        // console.log(tempDiv.innerText);
+
     }
 
     document.body.removeChild(tempDiv);
@@ -108,12 +106,9 @@ buttonsArray[0].focus();
 buttonsArray.forEach( (button,index) => {
     button.addEventListener( "click" , () => {
 
-        buttonsArray[curButton].style.backgroundColor="white"; 
 
         curButton = index;
-
-        buttonsArray[curButton].style.backgroundColor="#0AA1DD";
-        displayImageForButton(curButton);
+       displayImageForButton(curButton);
 
 
     })
@@ -123,12 +118,10 @@ buttonsArray.forEach((button,index) => {
     button.addEventListener("keydown" , (event) => {
 
         
-        console.log("PrevButton " , curButton);
         curButton = index;  
         let id = `button-${curButton}`;
-    
+        
         buttonsArray[curButton].blur();
-
 
         if(event.key == "ArrowUp"){
          --curButton;
@@ -142,12 +135,11 @@ buttonsArray.forEach((button,index) => {
         
         console.assert(curButton>=0 && curButton<numButtons, "out of bounds");
 
-        let buttonNo = `button-${curButton}`;
-      
+        
         id = `button-${curButton}`;
 
-         buttonsArray[curButton].focus(); 
-       displayImageForButton(curButton); 
+        buttonsArray[curButton].focus(); 
+        displayImageForButton(curButton); 
      
     });
 });
