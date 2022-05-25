@@ -135,15 +135,11 @@ buttonsArray.forEach((button,index) => {
          if(curButton==-1) curButton = numButtons-1;
         }
 
-        else if(event.key == "ArrowDown" || event.key=="Tab"){
+        else if(event.key == "ArrowDown"){
            curButton++;
            if(curButton==numButtons) curButton=0;
         }
         
-
-        console.log("curButton " , curButton);
-        console.log("key " , event.key);
-
         console.assert(curButton>=0 && curButton<numButtons, "out of bounds");
 
         let buttonNo = `button-${curButton}`;
