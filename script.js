@@ -122,31 +122,37 @@ buttonsArray.forEach( (button,index) => {
 buttonsArray.forEach((button,index) => {
     button.addEventListener("keydown" , (event) => {
 
-        event.preventDefault();
-
+        
         console.log("PrevButton " , curButton);
         curButton = index;  
+        let id = `button-${curButton}`;
+    
+        buttonsArray[curButton].blur();
 
-        buttonsArray[curButton].style.backgroundColor = "white";
+
         if(event.key == "ArrowUp"){
-          curButton = (curButton-1)%numButtons;
-          if(curButton<0) curButton+=numButtons;
+         --curButton;
+         if(curButton==-1) curButton = numButtons-1;
         }
 
         else if(event.key == "ArrowDown" || event.key=="Tab"){
-           curButton = (curButton+1)%numButtons;
-           if(curButton<0) curButton+=numButtons;
+           curButton++;
+           if(curButton==numButtons) curButton=0;
         }
         
 
         console.log("curButton " , curButton);
         console.log("key " , event.key);
 
+        console.assert(curButton>=0 && curButton<numButtons, "out of bounds");
+
         let buttonNo = `button-${curButton}`;
+      
+        id = `button-${curButton}`;
 
-        document.getElementById(buttonNo).focus(); 
-        displayImageForButton(curButton);
-
+         buttonsArray[curButton].focus(); 
+       displayImageForButton(curButton); 
+     
     });
 });
 
